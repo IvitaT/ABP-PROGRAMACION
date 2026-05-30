@@ -21,7 +21,7 @@ while sistema_activo:
     print("=========================================")
     print("1. Registrar Alta de Servicio")
     print("2. Modificar Servicio (Cambiar Velocidad)")
-    print("3. Dar de Baja Cliente")
+    print("3. Dar de Baja servicio")
     print("4. Salir")
     print("=========================================")
     
@@ -33,7 +33,7 @@ while sistema_activo:
     if opcion == "1":
         print("\n--- 📝 FORMULARIO DE ALTA DE SERVICIO ---")
         
-        dni = input("DNI del Cliente: ").strip()
+        dni = input("Ingresa tu numero de DNI sin puntos ni espacios (400000): ").strip()
         nombre = input("Nombre: ").strip()
         apellido = input("Apellido: ").strip()
         correo = input("Correo Electrónico: ").strip()
@@ -181,7 +181,7 @@ while sistema_activo:
             except mysql.connector.Error as err:
                 print(f"❌ Error al modificar en la base de datos: {err}")
         else:
-            print("\n❌ ERROR: No se encontró ninguna solicitud registrada con ese ID o DNI.")
+            print("\n❌ ERROR: No se encontró ninguna solicitud registrada con ese DNI o ID, Ingresa por la opcion de alta (1).")
 
 
         # COMANDOS DE OPCION 3
@@ -191,7 +191,7 @@ while sistema_activo:
         
         dato_busqueda = input("Ingresa tu numero de DNI sin puntos o tu numero de solicitud para empezar con el proceso de baja:").strip()
         
-        # 1. Buscamos todas las coincidencias con fetchall
+        # 1. Buscamos todas las coincidencias
         query_buscar = """SELECT s.id_solicitud, s.id_servicio, c.nombre, c.apellido, ser.velocidad_mb, s.calle, s.numero, cob.nombre_barrio, c.dni
                           FROM solicitudes s
                           INNER JOIN clientes c ON s.dni_cliente = c.dni
@@ -215,8 +215,20 @@ while sistema_activo:
                     sol = resultados[i]
                     print(f"[{i + 1}] Solicitud N° {sol[0]} - Domicilio: {sol[5]} {sol[6]} ({sol[7]}) | Plan: {sol[4]} MB")
                 
-                indice_elegido = int(input("\nSeleccione el número de opción: ")) - 1
-                solicitud_seleccionada = resultados[indice_elegido]
+                opcion_baja = input("\nSeleccione el número de opción: ").strip()
+
+                if opcion_baja.isdigit():
+                    indice_elegido = int(opcion_baja) - 1
+
+                    if indice_elegido >= 0 and indice_elegido < len(resultados):
+                           solicitud_seleccionada = resultados[indice_elegido]
+                    else:
+                     print("\n❌ Opción inválida. No existe un servicio con ese número.")
+                     continue
+                else:
+                    print("\n❌ Debe ingresar un número válido.")
+                    continue
+
             else:
                 solicitud_seleccionada = resultados[0]
                 
